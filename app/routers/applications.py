@@ -1,32 +1,34 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from typing import List
-from app.schemas import JobApplicationCreate, JobApplicationResponse
+from sqlalchemy.orm import Session
+from app.schemas import ApplicationCreate, ApplicationResponse
+from app.database import get_db
+from app.models import Application
 
 # Create router for job application endpoints
 router = APIRouter()
 
-# In-memory storage for job applications
-applications_db = []
-next_id = 1
-
-@router.post("/", response_model=JobApplicationResponse)
-def create_application(application: JobApplicationCreate):
+@router.post("/", response_model=ApplicationResponse)
+def create_application(application: ApplicationCreate, db: Session = Depends(get_db)):
     """Create a new job application"""
-    global next_id
-    
-    # Create new application with generated ID
-    new_application = JobApplicationResponse(
-        id=next_id,
-        **application.dict()
+    # Create SQLAlchemy model instance
+    db_application = Application(
+        company_name=application.company_name,
+        position=application.position,
+        status=application.status,
+        applied_date=application.applied_date,
+        notes=application.notes
     )
     
-    # Store in memory and increment ID counter
-    applications_db.append(new_application)
-    next_id += 1
+    # Add to database session
+    db.add(db_application)
+    db.commit()
+    db.refresh(db_application)
     
-    return new_application
+    return db_application
 
-@router.get("/", response_model=List[JobApplicationResponse])
-def get_applications():
+@router.get("/", response_model=list[ApplicationResponse])
+def get_applications(db: Session = Depends(get_db)):
     """Get all job applications"""
-    return applications_db
+    applications = db.query(Application).all()
+    return applications
