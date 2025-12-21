@@ -2,9 +2,11 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
+load_dotenv()
 
 # Get database URL from environment variables
-DATABASE_URL = os.getenv("DATABASE_URL","postgresql://postgres:315995589@localhost:5432/job_tracker")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Create SQLAlchemy engine
 engine = create_engine(DATABASE_URL)
@@ -23,5 +25,3 @@ def get_db():
         yield db
     finally:
         db.close()
-
-
