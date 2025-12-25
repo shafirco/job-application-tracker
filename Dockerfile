@@ -4,11 +4,20 @@ FROM python:3.12-slim
 # Set working directory in container
 WORKDIR /app
 
-# Copy requirements file
-COPY requirements.txt .
+# Install Poetry
+RUN pip install --no-cache-dir poetry
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Configure Poetry to not create virtual environment
+ENV POETRY_NO_INTERACTION=1 \
+    POETRY_CACHE_DIR=/tmp/poetry_cache
+
+# Copy Poetry configuration files
+COPY pyproject.toml poetry.lock* ./
+
+# Install dependencies using Poetry
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-root --only main \
+    && rm -rf $POETRY_CACHE_DIR
 
 # Copy application code
 COPY app/ ./app/

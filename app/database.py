@@ -1,27 +1,25 @@
 import os
-from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 load_dotenv()
 
 # Get database URL from environment variables
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Create SQLAlchemy engine
-engine = create_engine(DATABASE_URL)
+# Create async SQLAlchemy engine
+engine = create_async_engine(DATABASE_URL)
 
-# Create SessionLocal class for database sessions
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Create AsyncSessionLocal class for database sessions
+AsyncSessionLocal = async_sessionmaker(
+    engine, class_=AsyncSession, expire_on_commit=False
+)
 
 # Create Base class for declarative models
 Base = declarative_base()
 
-# Dependency function to get database session
-def get_db():
-    """Dependency that provides a database session"""
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# Dependency function to get async database session
+async def get_db():
+    """Dependency that provides an async database session"""
+    async with AsyncSessionLocal() as session:
+        yield session

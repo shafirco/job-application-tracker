@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "job-tracker"
+version = "0.1.0"
+description = "A RESTful API backend for tracking job applications built with FastAPI, SQLAlchemy, and PostgreSQL."
+authors = ["Shafir Cohen"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.127.0"
+uvicorn = "^0.40.0"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.45"}
+psycopg = {extras = ["binary"], version = "^3.3.2"}
+python-dotenv = "^1.2.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
