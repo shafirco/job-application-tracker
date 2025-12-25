@@ -1,8 +1,10 @@
+"""Application model for job applications."""
+
 from sqlalchemy import Column, Integer, String, Date, Text
-from app.database import Base
+from .base import Base
 
 class Application(Base):
-    """SQLAlchemy model for job applications"""
+    """SQLAlchemy model for job applications."""
     __tablename__ = "applications"
     
     id = Column(Integer, primary_key=True, index=True)
